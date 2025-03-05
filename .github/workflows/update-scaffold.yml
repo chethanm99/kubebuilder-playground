@@ -7,16 +7,24 @@ on:
   workflow_dispatch: # Allows manual trigger
 
 jobs:
-  scaffold-update:
+  update-scaffold:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.21'
+
+ - name: Install Kubebuilder
+        run: |
+          curl -L -o kubebuilder.tar.gz https://go.kubebuilder.io/dl/latest/linux/amd64
+          tar -xvf kubebuilder.tar.gz
+          sudo mv kubebuilder /usr/local/kubebuilder
+          echo 'export PATH=$PATH:/usr/local/kubebuilder/bin' >> $HOME/.bashrc
+          source $HOME/.bashrc
 
       - name: Run scaffold update
         run: |
