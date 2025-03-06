@@ -57,7 +57,7 @@ jobs:
           echo "Running scaffold update..."
           # Add actual commands to update scaffolding here
 
-     - name: Push changes
+      - name: Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -66,6 +66,6 @@ jobs:
           git commit -m "Automated scaffold update from GitHub Actions" || echo "No changes to commit"
           git push origin main
 
-       env:
+        env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
