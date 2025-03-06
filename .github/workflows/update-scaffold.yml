@@ -1,4 +1,4 @@
-me: Update Scaffold
+name: Update Scaffold
 
 on:
   push:
