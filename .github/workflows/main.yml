@@ -1,0 +1,50 @@
+name: Create PR on Release
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - main
+
+jobs:
+  create-pr:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]  # Supports multiple OS
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create a Branch
+        run: |
+          git checkout -b update-branch
+        shell: bash  # Ensures compatibility across OS
+
+      - name: Modify a Mock File
+        run: |
+          echo "Updated on $(date)" >> mock-file.txt
+        shell: bash  # Ensures script runs properly
+
+      - name: Commit Changes
+        run: |
+          git add mock-file.txt
+          git commit -m "Auto-update: New Release Triggered"
+          git push origin update-branch
+        shell: bash  # Compatible with all OS
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: update-branch
+          title: "Automated PR: New Release Update"
+          body: "This PR was automatically created when a new release was published."
+          labels: "automated-pr"
+          draft: false
