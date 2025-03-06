@@ -34,12 +34,9 @@ jobs:
 
       - name: Install Kubebuilder
         run: |
-          curl -L -o kubebuilder.tar.gz https://go.kubebuilder.io/dl/latest/linux/amd64
-          tar -xvf kubebuilder.tar.gz
-          sudo mv kubebuilder /usr/local/kubebuilder
-          echo 'export PATH=$PATH:/usr/local/kubebuilder/bin' >> $HOME/.bashrc
-          source $HOME/.bashrc
-
+         curl -L -o kubebuilder.tar.gz https://github.com/kubernetes-sigs/kubebuilder/releases/latest/download/kubebuilder_linux_amd64.tar.gz
+         tar -xvzf kubebuilder.tar.gz
+         
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
