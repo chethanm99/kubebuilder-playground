@@ -1,0 +1,19 @@
+name: Install Kubebuilder
+
+on: [push, pull_request]
+
+jobs:
+  install-kubebuilder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt update && sudo apt install -y jq
+
+      - name: Download and Extract Kubebuilder
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kubebuilder/releases/latest | jq -r '.tag_name')
+          curl -L -o kubebuilder.tar.gz "https://github.com/kubernetes-sigs/kubebuilder/releases/download/${LATEST_VERSION}/kubebuilder_linux_amd64.tar.gz"
+          tar -xvzf kubebuilder.tar.gz
