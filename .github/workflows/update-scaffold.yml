@@ -9,6 +9,7 @@ on:
 jobs:
   update-scaffold:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,7 +24,7 @@ jobs:
           go-version: '1.21'
           cache: false
 
-       - name: Cache Go Modules  # Fix for Cache Conflict 409
+      - name: Cache Go Modules  # Fix for Cache Conflict 409
         uses: actions/cache@v3
         with:
           path: ~/go/pkg/mod
@@ -33,12 +34,9 @@ jobs:
 
       - name: Install Kubebuilder
         run: |
-          curl -L -o kubebuilder.tar.gz https://go.kubebuilder.io/dl/latest/linux/amd64
-          tar -xvf kubebuilder.tar.gz
-          sudo mv kubebuilder /usr/local/kubebuilder
-          echo 'export PATH=$PATH:/usr/local/kubebuilder/bin' >> $HOME/.bashrc
-          source $HOME/.bashrc
-
+         curl -L -o kubebuilder.tar.gz https://github.com/kubernetes-sigs/kubebuilder/releases/latest/download/kubebuilder_linux_amd64.tar.gz
+         tar -xvzf kubebuilder.tar.gz
+         
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -56,10 +54,15 @@ jobs:
           echo "Running scaffold update..."
           # Add actual commands to update scaffolding here
 
-      - name: Commit and push changes
+      - name: Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/chethanm99/kubebuilder-playground.git
           git add .
-          git commit -m "Automated scaffold update" || echo "No changes to commit"
-          git push
+          git commit -m "Automated scaffold update from GitHub Actions" || echo "No changes to commit"
+          git push origin main
+
+        env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

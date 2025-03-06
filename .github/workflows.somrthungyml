@@ -1,0 +1,40 @@
+name: Auto Create PR
+
+on:
+  push:
+    branches:
+      - main  # Runs when changes are pushed to main
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create New Branch
+        run: |
+          git checkout -b auto-pr-branch
+
+      - name: Add a Test File
+        run: |
+          echo "This is a test file created by GitHub Actions as a proof of concept." > test-file.txt
+          git add test-file.txt
+          git commit -m "Add test file for automated PR"
+
+      - name: Push Branch
+        run: git push origin auto-pr-branch
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: auto-pr-branch
+          title: "Automated PR: Test File Addition"
+          body: "This PR was automatically created by GitHub Actions as a proof of concept."
+          labels: "automated-pr"
