@@ -1,4 +1,4 @@
-name: Update Scaffold
+me: Update Scaffold
 
 on:
   push:
@@ -56,10 +56,11 @@ jobs:
           echo "Running scaffold update..."
           # Add actual commands to update scaffolding here
 
-      - name: Commit and push changes
+     - name: Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/chethanm99/kubebuilder-playground.git
           git add .
-          git commit -m "Automated scaffold update" || echo "No changes to commit"
-          git push
+          git commit -m "Automated scaffold update from GitHub Actions" || echo "No changes to commit"
+          git push origin main
