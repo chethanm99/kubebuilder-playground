@@ -1,0 +1,59 @@
+name: Auto PR Creation for Kubebuilder Updates
+
+on:
+  push:
+    branches:
+      - main  # Adjust branch as needed
+  workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  update-kubebuilder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Required Dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y tar curl jq git
+
+      - name: Identify Latest Kubebuilder Release
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kubebuilder/releases/latest | jq -r '.tag_name')
+          echo "Latest Kubebuilder version: $LATEST_VERSION"
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+
+      - name: Download and Extract Kubebuilder
+        run: |
+          curl -L -o kubebuilder.tar.gz "https://github.com/kubernetes-sigs/kubebuilder/releases/download/${LATEST_VERSION}/kubebuilder_linux_amd64.tar.gz"
+          file kubebuilder.tar.gz  # Verify the file type
+          tar -xvzf kubebuilder.tar.gz || { echo "Tar extraction failed"; exit 1; }
+          sudo mv kubebuilder /usr/local/bin/kubebuilder
+          kubebuilder version
+
+      - name: Check for Changes
+        run: |
+          git status
+          if git diff --quiet; then
+            echo "No changes detected. Exiting."
+            exit 0
+          fi
+
+      - name: Create a New Branch for Updates
+        run: |
+          BRANCH_NAME="update-kubebuilder-${{ env.LATEST_VERSION }}"
+          git checkout -b $BRANCH_NAME
+          git add .
+          git commit -m "Update Kubebuilder to ${{ env.LATEST_VERSION }}"
+          git push origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: ${{ env.BRANCH_NAME }}
+          base: main
+          title: "Update Kubebuilder to ${{ env.LATEST_VERSION }}"
+          body: "This PR updates Kubebuilder to the latest release."
+          labels: "automated-update"
+          token: ${{ secrets.GITHUB_TOKEN }}
