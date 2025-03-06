@@ -60,7 +60,11 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/chethanm99/kubebuilder-playground.git
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/chethanm99/kubebuilder-playground.git
           git add .
           git commit -m "Automated scaffold update from GitHub Actions" || echo "No changes to commit"
           git push origin main
+
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
