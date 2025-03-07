@@ -8,6 +8,10 @@ on:
     - cron: "0 0 * * 1" # Runs weekly on Monday
   workflow_dispatch:  # Allows manual execution
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   auto-update:
     runs-on: ubuntu-latest

@@ -1,0 +1,32 @@
+---
+
+name: Install Kubebuilder
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+  push:
+    branches:
+      - main
+
+jobs:
+  install-kubebuilder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Latest Kubebuilder Version
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kubebuilder/releases/latest | jq -r .tag_name)
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+
+      - name: Download and Install Kubebuilder
+        run: |
+          curl -L -o kubebuilder.tar.gz "https://github.com/kubernetes-sigs/kubebuilder/releases/download/${LATEST_VERSION}/kubebuilder_linux_amd64.tar.gz"
+          tar -xvf kubebuilder.tar.gz
+          sudo mv kubebuilder /usr/local/bin/kubebuilder
+          kubebuilder version
+
+      - name: Verify Kubebuilder Installation
+        run: kubebuilder version
+
