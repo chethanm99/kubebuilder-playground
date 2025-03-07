@@ -23,12 +23,12 @@ jobs:
       - name: Modify File (Simulate an Update)  # ✅ Step 3 is inside the workflow
         run: |
           echo "Updated on $(date)" >> version.txt
-    - name: Ensure version.txt exists
-      run: |
-        if [ ! -f version.txt ]; then
+      - name: Ensure version.txt exists
+        run: |
+          if [ ! -f version.txt ]; then
           echo "Creating version.txt..."
           echo "Initial version: 1.0.0" > version.txt
-        fi
+          fi
 
       - name: Commit and Push Changes
         run: |
